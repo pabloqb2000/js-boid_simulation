@@ -11,13 +11,18 @@ class Boid {
         this.acc = Vector.random2D();
 
         this.angle = PI/6;
+        this.showInfo = false;
+        this.color = color(230);
     }
 
     /**
      * Update this boid based on it's neighbour boids and the obstacles
      */
     update(neighbours, obstacles) {
+        if(this.showInfo) neighbours.forEach((n) => n.color = color(255, 0, 0));
         neighbours = neighbours.filter(n => n.pos != this.pos && n.pos.dist(this.pos) < this.sim.viewR);
+        if(this.showInfo) neighbours.forEach((n) => n.color = color(0, 255, 0));
+        if(this.showInfo) this.color = color(0,0,255);
         obstacles = obstacles.filter(o => o.nearestPt(this.pos).dist(this.pos) < this.sim.viewR);
 
         if(neighbours.length > 0) {
@@ -78,18 +83,17 @@ class Boid {
      * Draw this boid
      */
     draw() {
-        if(this.sim.fov) {
-            // Draw field of view
-            stroke(64);
-            strokeWeight(1);    
-            fill(40, 32);
-            ellipse(this.pos.getX(), this.pos.getY(), this.sim.viewR*2, this.sim.viewR*2);
-        }
-
-        // Draw shape
         noFill();
         strokeWeight(1);
-        stroke(230);
+
+        if(this.sim.fov) {
+            // Draw field of view
+            stroke(saturation(this.color) > 50 ? this.color : 60)
+            ellipse(this.pos.getX(), this.pos.getY(), this.sim.viewR*2, this.sim.viewR*2);
+        }
+        stroke(this.color);
+
+        // Draw shape
         beginShape();
         
         let pt = this.vel.copy().setNorm(this.size*cos(this.angle)).add(this.pos);

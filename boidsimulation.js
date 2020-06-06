@@ -18,6 +18,7 @@ class BoidSimulation {
         this.avoidance = avdSld.value;
         this.maxVel = maxVelSld.value;
         this.fov = fovBtn.active;
+        this.info = showInfoBtn.active;
 
         // Add obstables
         this.obstacles = [
@@ -27,8 +28,8 @@ class BoidSimulation {
             new WallObst(3, 0),
             new CircleObst(createVector(w/4, h/4), w/40),
             new CircleObst(createVector(3*w/4, 3*h/4), w/20),
-            new RectObst(createVector(w/4, 3*h/4), w/20, w/20, 5),
-            new RectObst(createVector(3*w/4, h/4), w/10, w/10, 5),
+            new RectObst(createVector(w/4, 3*h/4), w/10, w/10, 5),
+            new RectObst(createVector(3*w/4, h/4), w/20, w/20, 5),
         ];
 
         // Add boids
@@ -56,12 +57,64 @@ class BoidSimulation {
     }
 
     /**
-     * Update all the boids
+     * First update the cell system
+     * then update all the boids
      */
     update() {
+        if(this.info) this.boids[0].showInfo = true;
+        else this.boids[0].showInfo = false;
+
+        // Create cells
+        this.cells = Array(ceil(this.h / this.viewR)).fill()
+            .map(() => Array(ceil(this.w / this.viewR)).fill()
+            .map(() => Array(0)));
+
+        // Fill cells
         for(let b of this.boids) {
-            b.update(this.boids, this.obstacles);
+            this.getCell(b).push(b);
+            b.color = color(230);
         }
+
+        // Update boids
+        for(let b of this.boids) {
+            //b.update(this.boids, this.obstacles);
+            b.update(this.getNeighbours(b), this.obstacles);
+        }
+    }
+
+    /**
+     * Get the cell corresponding to a boid
+     */
+    getCell(b) {
+        return this.cells[floor(b.pos.getY() / this.viewR)][floor(b.pos.getX() / this.viewR)];
+    }
+
+    /**
+     * Get the boids in the cell and the neighbour cells of the given boid
+     */
+    getNeighbours(b) {
+        let i = floor(b.pos.getY() / this.viewR);
+        let j = floor(b.pos.getX() / this.viewR);
+        let n = this.cells[i][j];
+        
+        if(i > 0){ 
+            n = n.concat(this.cells[i-1][j]);
+            if(j > 0) n = n.concat(this.cells[i-1][j-1]);
+        }
+        if(j > 0) {
+            n = n.concat(this.cells[i][j-1]);
+            if(i < this.cells.length - 1) n = n.concat(this.cells[i+1][j-1])
+        }
+        if(i < this.cells.length - 1){ 
+            n = n.concat(this.cells[i+1][j]);
+            if(j < this.cells[0].length - 1) n = n.concat(this.cells[i+1][j+1]);
+        }
+        if(j < this.cells[0].length - 1) {
+            n = n.concat(this.cells[i][j+1]);
+            if(i > 0) n = n.concat(this.cells[i-1][j+1]);
+        }
+
+        return n;
     }
 
     /**
