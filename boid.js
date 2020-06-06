@@ -3,7 +3,7 @@ class Boid {
      * 
      * @param pos Initial position 
      */
-    constructor(pos, simulation, size=15) {
+    constructor(pos, simulation, size=10) {
         this.pos = pos;
         this.size = size;
         this.sim = simulation;
@@ -20,30 +20,46 @@ class Boid {
         neighbours = neighbours.filter(n => n.pos != this.pos && n.pos.dist(this.pos) < this.sim.viewR);
         
         if(neighbours.length > 0) {
-            let sep = this.separation(neighbours).setNorm(this.sim.separation);
-            let coh = this.cohesion(neighbours).setNorm(this.sim.cohesion);
-            this.acc = sep.add(coh);
+            let sep = this.separation(neighbours).mult(this.sim.separation);
+            let coh = this.cohesion(neighbours).mult(this.sim.cohesion);
+            let alg = this.align(neighbours).mult(this.sim.alignment);
+            this.acc = sep.add(coh).add(alg);
         } else {
             this.acc = new Vector([0,0]);
         }
+
         this.vel.add(this.acc).limit(this.sim.maxVel);
-        this.vel.print();
-        this.pos.print();
         this.pos.add(this.vel);
+
+        // If position is out of boundries loop it back on the other side
+        this.pos.set(0, this.pos.getX() + (this.pos.getX() > this.sim.w ? -this.sim.w : 0));
+        this.pos.set(0, this.pos.getX() + (this.pos.getX() < 0 ? this.sim.w : 0));
+        this.pos.set(1, this.pos.getY() + (this.pos.getY() > this.sim.h ? -this.sim.h : 0));
+        this.pos.set(1, this.pos.getY() + (this.pos.getY() < 0 ? this.sim.h : 0));
     }
 
     /**
      * Separate from the neighbour boids
      */
     separation(neighbours) {
-        return neighbours.map(n => n.pos.copy().sub(this.pos).mult(-1)).reduce((x,y) => x.add(y));
+        let sep = neighbours.map(n => n.pos.copy().sub(this.pos))
+        sep = sep.map(n => n.setNorm(-1/n.norm())).reduce((x,y) => x.add(y));
+        return sep.setNorm(this.sim.maxVel);
     }
 
     /**
      * Move towards the average position of neighbour boids
      */
     cohesion(neighbours) {
-        return neighbours.map(n => n.pos.copy()).reduce((x,y) => x.add(y)).div(neighbours.length).sub(this.pos);
+        return neighbours.map(n => n.pos.copy()).reduce((x,y) => x.add(y)).div(neighbours.length)
+            .sub(this.pos).setNorm(this.sim.maxVel);
+    }
+
+    /**
+     * Align with the neighbour boids
+     */
+    align(neighbours) {
+        return neighbours.map(n => n.vel.copy()).reduce((x,y) => x.add(y)).setNorm(this.sim.maxVel);
     }
 
     /**
@@ -52,8 +68,9 @@ class Boid {
     draw() {
         if(this.sim.fov) {
             // Draw field of view
-            stroke(70, 50);
-            fill(50, 50);
+            stroke(64);
+            strokeWeight(1);    
+            fill(40, 32);
             ellipse(this.pos.getX(), this.pos.getY(), this.sim.viewR*2, this.sim.viewR*2);
         }
 

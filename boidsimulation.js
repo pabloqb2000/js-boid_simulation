@@ -2,8 +2,10 @@ class BoidSimulation {
     /**
      * 
      * @param n number of initial boids
+     * @param w width of the simulation
+     * @param h height of the simulation
      */
-    constructor(n, w=width, h=height) {
+    constructor(n, w, h) {
         this.boids = [];
         this.w = w;
         this.h = h;
@@ -13,11 +15,12 @@ class BoidSimulation {
         }
         
         // Default parameters
-        this.viewR = 100;
-        this.fov = true;
-        this.separation = 0.1;
-        this.cohesion = 0.2;
-        this.maxVel = 5;
+        this.viewR = viewRSld.value;
+        this.separation = sepSld.value;
+        this.cohesion = cohSld.value;
+        this.alignment = algSld.value;
+        this.maxVel = maxVelSld.value;
+        this.fov = fovBtn.active;
     }
 
     /**
@@ -25,8 +28,15 @@ class BoidSimulation {
      */
     newBoid() {
         this.boids.push(new Boid(
-            new Vector([random(this.w/3, 2/3*this.w), random(this.h/3, 2/3*this.h)]), 
+            new Vector(this.randomNewPos()), 
                         this));
+    }
+
+    /**
+     * Returns an available random new position
+     */
+    randomNewPos() {
+        return [random(this.w/3, 2/3*this.w), random(this.h/3, 2/3*this.h)];
     }
 
     /**
