@@ -14,18 +14,20 @@ class Boid {
     }
 
     /**
-     * Update this boid based on it's neighbour boids
+     * Update this boid based on it's neighbour boids and the obstacles
      */
-    update(neighbours) {
+    update(neighbours, obstacles) {
         neighbours = neighbours.filter(n => n.pos != this.pos && n.pos.dist(this.pos) < this.sim.viewR);
-        
+        obstacles = obstacles.filter(o => o.nearestPt(this.pos).dist(this.pos) < this.sim.viewR);
+
         if(neighbours.length > 0) {
             let sep = this.separation(neighbours).mult(this.sim.separation);
             let coh = this.cohesion(neighbours).mult(this.sim.cohesion);
             let alg = this.align(neighbours).mult(this.sim.alignment);
-            this.acc = sep.add(coh).add(alg);
+            let avd = this.avoid(obstacles).mult(this.sim.avoidance);
+            this.acc = sep.add(coh).add(alg).add(avd);
         } else {
-            this.acc = new Vector([0,0]);
+            this.acc = this.avoid(obstacles).mult(this.sim.avoidance);
         }
 
         this.vel.add(this.acc).limit(this.sim.maxVel);
@@ -60,6 +62,16 @@ class Boid {
      */
     align(neighbours) {
         return neighbours.map(n => n.vel.copy()).reduce((x,y) => x.add(y)).setNorm(this.sim.maxVel);
+    }
+
+    /**
+     * Avoid the obstacles
+     */
+    avoid(obstacles) {
+        return obstacles.length > 0 ?
+            obstacles.map(o => Vector.sub(this.pos, o.nearestPt(this.pos)))
+            .map(p => p.setNorm(1/p.norm())).reduce((x,y) => x.add(y)).setNorm(this.sim.maxVel) :
+            new Vector([0,0]);
     }
 
     /**
