@@ -19,10 +19,10 @@ class Boid {
      * Update this boid based on it's neighbour boids and the obstacles
      */
     update(neighbours, obstacles) {
-        if(this.showInfo) neighbours.forEach((n) => n.color = color(255, 0, 0));
+        if(this.showInfo) neighbours.forEach((n) => n.color = color(227, 103, 86));
         neighbours = neighbours.filter(n => n.pos != this.pos && n.pos.dist(this.pos) < this.sim.viewR);
-        if(this.showInfo) neighbours.forEach((n) => n.color = color(0, 255, 0));
-        if(this.showInfo) this.color = color(0,0,255);
+        if(this.showInfo) neighbours.forEach((n) => n.color = color(86, 210, 227));
+        if(this.showInfo) this.color = color(105, 227, 86);
         obstacles = obstacles.filter(o => o.nearestPt(this.pos).dist(this.pos) < this.sim.viewR);
 
         if(neighbours.length > 0) {
