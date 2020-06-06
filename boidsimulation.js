@@ -25,8 +25,10 @@ class BoidSimulation {
             new WallObst(1, w),
             new WallObst(2, h),
             new WallObst(3, 0),
-            new CircleObst(createVector(w/2, h/2), w/40),
-            new RectObst(createVector(w/3, h/3), w/20, w/20, 5)
+            new CircleObst(createVector(w/4, h/4), w/40),
+            new CircleObst(createVector(3*w/4, 3*h/4), w/20),
+            new RectObst(createVector(w/4, 3*h/4), w/20, w/20, 5),
+            new RectObst(createVector(3*w/4, h/4), w/10, w/10, 5),
         ];
 
         // Add boids
