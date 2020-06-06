@@ -13,7 +13,7 @@ function setup() {
 	algSld     = new Slider(0, 1, 0.05, 0,0, width/12, height/60, null, "Aligment", true, 2, () => simulation.alignment = algSld.value);
 	avdSld     = new Slider(0, 1, 0.25, 0,0, width/10, height/60, null, "Avoidance", true, 2, () => simulation.avoidance = avdSld.value);
 	maxVelSld  = new Slider(1,10, 2.4, 0,0, width/12, height/60, null, "Max vel", true, 0, () => simulation.maxVel = maxVelSld.value);
-	nBoidsSld  = new Slider(5, 500, 200, 0,0, width/12, height/60, null, "Boids", true, 0, changeNBoids);
+	nBoidsSld  = new Slider(5, 500, 100, 0,0, width/12, height/60, null, "Boids", true, 0, changeNBoids);
 	fovBtn     = new ToggleButton(0,0, width/12, height/30, "show FOV", () => simulation.fov = fovBtn.active);
 	showInfoBtn= new ToggleButton(0,0, width/12, height/30, "show Info", () => simulation.info = showInfoBtn.active);
 	hideBtn    = new Button(0,0, width/12, height/30, "Hide UI", hideUI);
