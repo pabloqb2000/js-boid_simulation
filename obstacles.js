@@ -43,11 +43,21 @@ class CircleObst extends DragCircle {
 
 class RectObst extends DragRect {
     nearestPt(pt) {
-        return Vector.fromDim(2);
+        if(this.isIn(pt)) {
+            return new Vector([0, 0]);
+        } else {
+            return new Vector([
+                min(this.pos.x + this.w/2, max(pt.getX(), this.pos.x - this.w/2)),
+                min(this.pos.y + this.h/2, max(pt.getY(), this.pos.y - this.h/2)),
+            ]);
+        }
     }
 
     isIn(pt) {
-        return false;
+        return pt.getX() < this.pos.x + this.w/2 &&
+               pt.getX() > this.pos.x - this.w/2 &&
+               pt.getY() < this.pos.y + this.h/2 &&
+               pt.getY() > this.pos.y - this.h/2;
     }
 
     draw() {
