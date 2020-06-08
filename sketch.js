@@ -3,6 +3,7 @@ let viewRSld, sepSld, cohSld, algSld, avdSld, maxVelSld, nBoidsSld;
 let fovBtn, showInfoBtn, hideBtn;
 
 function setup() {
+	textFont("Sarpanch");
 	createCanvas(windowWidth, windowHeight);
 	background(32);
 
